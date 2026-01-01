@@ -1,15 +1,17 @@
 import axios from "axios";
 
-export const getJude0LanguageId = (Language)=>{
+export const getJude0LanguageId = (language)=>{
     const languageMap = {
         "PYTHON":71,
         "JAVA":62,
         "JAVASCRIPT":63,
-    
     }
-    return languageMap[Language.toUpperCase()] || null;
+
+    return languageMap[language.toUpperCase()] || null;
 
 }
+const sleep  = (ms)=> new Promise((resolve)=> setTimeout(resolve , ms))
+
 export const pollBatchResults = async (tokens)=>{
     while(true){
         const {data} = await axios.get(`${process.env.JUDGE0_API_URL}/submissions/batch`,{
