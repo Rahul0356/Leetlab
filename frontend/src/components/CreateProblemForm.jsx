@@ -1,7 +1,7 @@
-import React from 'react'
+import React from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {z} from "zod"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
   Plus,
   Trash2,
@@ -13,12 +13,12 @@ import {
   Download,
 } from "lucide-react";
 import Editor from "@monaco-editor/react";
-import { useState } from 'react';
-import {axiosInstance} from "../lib/axios"
+import { useState } from "react";
+import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
-import { useNavigation } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
-const problemSchema= z.object({
+const problemSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
   description: z.string().min(10, "Description must be at least 10 characters"),
   difficulty: z.enum(["EASY", "MEDIUM", "HARD"]),
@@ -62,6 +62,7 @@ const problemSchema= z.object({
     JAVA: z.string().min(1, "Java solution is required"),
   }),
 });
+
 const sampledpData = {
   title: "Climbing Stairs",
   category: "dp", // Dynamic Programming
@@ -133,23 +134,23 @@ console.log(result);
 rl.close();
 });`,
     PYTHON: `class Solution:
-  def climbStairs(self, n: int) -> int:
-      # Write your code here
-      pass
+    def climbStairs(self, n: int) -> int:
+        # Write your code here
+        pass
 
 # Input parsing
 if __name__ == "__main__":
-  import sys
-  
-  # Parse input
-  n = int(sys.stdin.readline().strip())
-  
-  # Solve
-  sol = Solution()
-  result = sol.climbStairs(n)
-  
-  # Print result
-  print(result)`,
+    import sys
+
+    # Parse input
+    n = int(sys.stdin.readline().strip())
+
+    # Solve
+    sol = Solution()
+    result = sol.climbStairs(n)
+
+    # Print result
+    print(result)`,
     JAVA: `import java.util.Scanner;
 
 class Main {
@@ -223,21 +224,21 @@ console.log(result);
 rl.close();
 });`,
     PYTHON: `class Solution:
-  def climbStairs(self, n: int) -> int:
+    def climbStairs(self, n: int) -> int:
       # Base cases
       if n <= 2:
-          return n
-      
+        return n
+
       # Dynamic programming approach
       dp = [0] * (n + 1)
       dp[1] = 1
       dp[2] = 2
-      
+
       for i in range(3, n + 1):
-          dp[i] = dp[i - 1] + dp[i - 2]
-      
+        dp[i] = dp[i - 1] + dp[i - 2]
+
       return dp[n]
-      
+
       # Alternative approach with O(1) space
       # a, b = 1, 2
       # 
@@ -246,19 +247,19 @@ rl.close();
       # 
       # return a if n == 1 else b
 
-# Input parsing
-if __name__ == "__main__":
-  import sys
-  
-  # Parse input
-  n = int(sys.stdin.readline().strip())
-  
-  # Solve
-  sol = Solution()
-  result = sol.climbStairs(n)
-  
-  # Print result
-  print(result)`,
+  # Input parsing
+  if __name__ == "__main__":
+    import sys
+
+    # Parse input
+    n = int(sys.stdin.readline().strip())
+
+    # Solve
+    sol = Solution()
+    result = sol.climbStairs(n)
+
+    # Print result
+    print(result)`,
     JAVA: `import java.util.Scanner;
 
 class Main {
@@ -308,6 +309,7 @@ class Main {
   },
 };
 
+// Sample problem data for another type of question
 // Sample problem data for another type of question
 const sampleStringProblem = {
   title: "Valid Palindrome",
@@ -508,14 +510,123 @@ public class Main {
 `,
   },
 };
+
+// Sample problem data for Add Two Numbers
+const sampleAddTwoNumbers = {
+  title: "Add Two Numbers",
+  description: "Given two numbers a and b add them up and return the outout",
+  difficulty: "EASY",
+  tags: ["math", "operators", "addition"],
+  constraints: "-10^9 ≤ a, b ≤ 10^9",
+  testcases: [
+    {
+      input: "100 200",
+      output: "300",
+    },
+    {
+      input: "-500 -600",
+      output: "-1100",
+    },
+    {
+      input: "0 0",
+      output: "0",
+    },
+  ],
+  examples: {
+    JAVASCRIPT: {
+      input: "-5 12",
+      output: "7",
+      explanation: "Adding -5 and 12 gives 7.",
+    },
+    PYTHON: {
+      input: "3 7",
+      output: "10",
+      explanation: "Adding 3 and 7 gives 10.",
+    },
+    JAVA: {
+      input: "3 7",
+      output: "10",
+      explanation: "Adding 3 and 7 gives 10.",
+    },
+  },
+  codeSnippets: {
+    JAVASCRIPT: `const fs = require('fs');
+
+function addTwoNumbers(a, b) {
+    // Write your code here
+    // Return the sum of a and b
+    return a + b;
+}
+
+// Reading input from stdin (using fs to read all input)
+const input = fs.readFileSync(0, 'utf-8').trim();
+const [a, b] = input.split(' ').map(Number);
+
+console.log(addTwoNumbers(a, b));`,
+    PYTHON: `def add_two_numbers(a, b):
+    # Write your code here
+    # Return the sum of a and b
+    return a + b
+
+import sys
+input_line = sys.stdin.read()
+a, b = map(int, input_line.split())
+print(add_two_numbers(a, b))`,
+    JAVA: `import java.util.Scanner;
+
+public class Main {
+    public static int addTwoNumbers(int a, int b) {
+        // Write your code here
+        // Return the sum of a and b
+        return a + b;
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int a = sc.nextInt();
+        int b = sc.nextInt();
+        System.out.println(addTwoNumbers(a, b));
+    }
+}`,
+  },
+  referenceSolutions: {
+    JAVASCRIPT: `const fs = require('fs');
+
+// Reading input from stdin (using fs to read all input)
+const input = fs.readFileSync(0, 'utf-8').trim();
+const [a, b] = input.split(' ').map(Number);
+
+console.log(a + b);`,
+    PYTHON: `import sys
+input_line = sys.stdin.read()
+a, b = map(int, input_line.split())
+print(a + b)`,
+    JAVA: `import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int a = sc.nextInt();
+        int b = sc.nextInt();
+        System.out.println(a + b);
+    }
+}`,
+  },
+};
+
 const CreateProblemForm = () => {
-    const [sampleType,setSampleType]= useState("DP");
-    const navigation = useNavigation();
-     const {register , control , handleSubmit , reset , formState:{errors}}= useForm(
-        {
-            resolver: zodResolver(problemSchema),
-            defaultValues:{
-                 testcases: [{ input: "", output: "" }],
+  const [sampleType, setSampleType] = useState("DP");
+  const navigation = useNavigate();
+  const {
+    register,
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(problemSchema),
+    defaultValues: {
+      testcases: [{ input: "", output: "" }],
       tags: [""],
       examples: {
         JAVASCRIPT: { input: "", output: "", explanation: "" },
@@ -532,13 +643,10 @@ const CreateProblemForm = () => {
         PYTHON: "# Add your reference solution here",
         JAVA: "// Add your reference solution here",
       },
-            }
-        }
-            
-    )
+    },
+  });
 
-
-      const {
+  const {
     fields: testCaseFields,
     append: appendTestCase,
     remove: removeTestCase,
@@ -547,7 +655,8 @@ const CreateProblemForm = () => {
     control,
     name: "testcases",
   });
-   const {
+
+  const {
     fields: tagFields,
     append: appendTag,
     remove: removeTag,
@@ -556,23 +665,46 @@ const CreateProblemForm = () => {
     control,
     name: "tags",
   });
- const [isLoading , setIsLoading] = useState(false);
- const onSubmit = async (value) => {
-    console.log(value)
- }
- const loadSampleData=()=>{
-    const sampleData = sampleType === "DP" ? sampledpData : sampleStringProblem;
-     
-    replaceTags(sampleData.tags.map((tag)=>tag));
-    replacetestcases(sampleData.testcases.map((tc)=>tc));
 
-    //Reset the form with sample data
-    resizeTo(sampleData);
- }
- 
+  const [isLoading, setIsLoading] = useState(false);
+
+  const onSubmit = async (value) => {
+    try {
+      setIsLoading(true);
+      const res = await axiosInstance.post("/problems/create-problem", value);
+      console.log(res.data);
+      toast.success(res.data.message || "Problem Created successfully⚡");
+      navigation("/");
+    } catch (error) {
+      console.log(error);
+      toast.error("Error creating problem");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const loadSampleData = () => {
+    let sampleData;
+    if (sampleType === "DP") {
+      sampleData = sampledpData;
+    } else if (sampleType === "string") {
+      sampleData = sampleStringProblem;
+    } else if (sampleType === "math") {
+      sampleData = sampleAddTwoNumbers;
+    } else {
+      sampleData = sampledpData;
+    }
+
+    replaceTags(sampleData.tags.map((tag) => tag));
+    replacetestcases(sampleData.testcases.map((tc) => tc));
+
+    // Reset the form with sample data
+    reset(sampleData);
+  };
+
   return (
-    <div className='container mx-auto py-8 px-4 max=w=7xl'>
-     <div className="card bg-base-100 shadow-xl">
+    <div className="container mx-auto py-8 px-4 max-w-7xl">
+      <div className="card bg-base-100 shadow-xl">
         <div className="card-body p-6 md:p-8">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 pb-4 border-b">
             <h2 className="card-title text-2xl md:text-3xl flex items-center gap-3">
@@ -584,21 +716,27 @@ const CreateProblemForm = () => {
               <div className="join">
                 <button
                   type="button"
-                  className={`btn join-item ${
-                    sampleType === "DP" ? "btn-active" : ""
-                  }`}
-                  onClick={() => setSampleType("array")}
+                  className={`btn join-item ${sampleType === "DP" ? "btn-active" : ""
+                    }`}
+                  onClick={() => setSampleType("DP")}
                 >
                   DP Problem
                 </button>
                 <button
                   type="button"
-                  className={`btn join-item ${
-                    sampleType === "string" ? "btn-active" : ""
-                  }`}
+                  className={`btn join-item ${sampleType === "string" ? "btn-active" : ""
+                    }`}
                   onClick={() => setSampleType("string")}
                 >
                   String Problem
+                </button>
+                <button
+                  type="button"
+                  className={`btn join-item ${sampleType === "math" ? "btn-active" : ""
+                    }`}
+                  onClick={() => setSampleType("math")}
+                >
+                  Math Problem
                 </button>
               </div>
               <button
@@ -1033,7 +1171,7 @@ const CreateProblemForm = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default CreateProblemForm
+export default CreateProblemForm;

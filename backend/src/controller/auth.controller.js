@@ -20,7 +20,6 @@ export const register = async (req , res)=>{
             })
         }
         
-
         const hashedPassword = await bcrypt.hash(password , 10);
 
         const newUser = await db.user.create({
@@ -82,12 +81,16 @@ export const login = async (req , res)=>{
             })
         }
         const isMatch = await bcrypt.compare(password , user.password);
+console.log("isMatch:", isMatch);
+console.log("user",user)
+         console.log(password , user.password);
 
         if(!isMatch){
             return res.status(401).json({
                 error:"Invalid credentials"
             })
         }
+        
 
         const token = jwt.sign({id:user.id},process.env.JWT_SECRET ,{
             expiresIn:"7d"
