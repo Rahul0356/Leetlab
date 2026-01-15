@@ -18,9 +18,12 @@ import {
 } from "lucide-react";
 
 import { useProblemStore } from "../store/useProblemStore";
-import {Link, useParams } from "react-router-dom";
-import {}
-
+import { Link, useParams } from "react-router-dom";
+import { getLanguageId } from "../lib/lang.js";
+import { useExecutionStore } from "../store/useExecution.js";
+import { useSubmissionStore } from "../store/useSubmissionStore";
+import Submission from "../components/Submission";
+import SubmissionsList from "../components/SubmissoinList";
 
 const ProblemPage = () => {
   const { id } = useParams();
@@ -192,7 +195,7 @@ const ProblemPage = () => {
     }
   };
   return (
-   <div className="min-h-screen bg-gradient-to-br from-base-300 to-base-200 max-w-7xl w-full">
+    <div className="min-h-screen bg-gradient-to-br from-base-300 to-base-200 max-w-7xl w-full">
       <nav className="navbar bg-base-100 shadow-lg px-4">
         <div className="flex-1 gap-2">
           <Link to={"/"} className="flex items-center gap-2 text-primary">
@@ -245,7 +248,7 @@ const ProblemPage = () => {
           </select>
         </div>
       </nav>
-     <div className="container mx-auto p-4">
+      <div className="container mx-auto p-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="card bg-base-100 shadow-xl">
             <div className="card-body p-0">
@@ -377,5 +380,4 @@ const ProblemPage = () => {
   );
 };
 
-
-export default ProblemPage
+export default ProblemPage;

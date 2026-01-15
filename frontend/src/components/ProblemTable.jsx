@@ -1,22 +1,27 @@
-import React,{useState,useMemo} from 'react'
-import { useAuthStore } from '../store/useAuthStore'
-import {Link} from "react-router-dom";
+import React, { useState, useMemo } from "react";
+import { useAuthStore } from "../store/useAuthStore";
+import { Link } from "react-router-dom";
 
-import {Bookmark,PencilIcon,Trash,TrashIcon,Plus} from "lucide-react";
+import { Bookmark, PencilIcon, Trash, TrashIcon, Plus } from "lucide-react";
+import { usePlaylistStore } from "../store/usePlaylistStore";
+import { useActions } from "../store/useAction";
+import CreatePlaylistModal from "./CreatePlaylistModal";
+import AddToPlaylistModal from "./AddToPlaylist";
 
-const ProblemTable = ({problems}) => {
-     const { authUser } = useAuthStore();
-//   const { onDeleteProblem } = useActions();
-//   const { createPlaylist } = usePlaylistStore();
+const ProblemTable = ({ problems }) => {
+  const { authUser } = useAuthStore();
+  const { onDeleteProblem } = useActions();
+  const { createPlaylist } = usePlaylistStore();
   const [search, setSearch] = useState("");
   const [difficulty, setDifficulty] = useState("ALL");
   const [selectedTag, setSelectedTag] = useState("ALL");
   const [currentPage, setCurrentPage] = useState(1);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isAddToPlaylistModalOpen, setIsAddToPlaylistModalOpen] = useState(false);
+  const [isAddToPlaylistModalOpen, setIsAddToPlaylistModalOpen] =
+    useState(false);
   const [selectedProblemId, setSelectedProblemId] = useState(null);
 
-   // Extract all unique tags from problems
+  // Extract all unique tags from problems
   const allTags = useMemo(() => {
     if (!Array.isArray(problems)) return [];
     const tagsSet = new Set();
@@ -24,12 +29,10 @@ const ProblemTable = ({problems}) => {
     return Array.from(tagsSet);
   }, [problems]);
 
-
   // Define allowed difficulties
   const difficulties = ["EASY", "MEDIUM", "HARD"];
 
-
-   // Filter problems based on search, difficulty, and tags
+  // Filter problems based on search, difficulty, and tags
   const filteredProblems = useMemo(() => {
     return (problems || [])
       .filter((problem) =>
@@ -43,31 +46,30 @@ const ProblemTable = ({problems}) => {
       );
   }, [problems, search, difficulty, selectedTag]);
 
-
-    // Pagination logic
-   const itemsPerPage = 5;
+  // Pagination logic
+  const itemsPerPage = 5;
   const totalPages = Math.ceil(filteredProblems.length / itemsPerPage);
-   const paginatedProblems = useMemo(() => {
+  const paginatedProblems = useMemo(() => {
     return filteredProblems.slice(
       (currentPage - 1) * itemsPerPage,
       currentPage * itemsPerPage
     );
   }, [filteredProblems, currentPage]);
-   const handleDelete = (id) => {
-   onDeleteProblem(id);
+  const handleDelete = (id) => {
+    onDeleteProblem(id);
   };
 
-   const handleCreatePlaylist = async (data) => {
-     await createPlaylist(data);
+  const handleCreatePlaylist = async (data) => {
+    await createPlaylist(data);
   };
 
-   const handleAddToPlaylist = (problemId) => {
+  const handleAddToPlaylist = (problemId) => {
     setSelectedProblemId(problemId);
     setIsAddToPlaylistModalOpen(true);
-   };
+  };
 
   return (
-     <div className="w-full max-w-6xl mx-auto mt-10">
+    <div className="w-full max-w-6xl mx-auto mt-10">
       {/* Header with Create Playlist Button */}
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Problems</h2>
@@ -130,7 +132,7 @@ const ProblemTable = ({problems}) => {
           <tbody>
             {paginatedProblems.length > 0 ? (
               paginatedProblems.map((problem) => {
-                const isSolved = problem.solvedBy.some(
+                const isSolved = (problem.solvedBy || []).some(
                   (user) => user.userId === authUser?.id
                 );
                 return (
@@ -144,7 +146,10 @@ const ProblemTable = ({problems}) => {
                       />
                     </td>
                     <td>
-                      <Link to={`/problem/${problem.id}`} className="font-semibold hover:underline">
+                      <Link
+                        to={`/problem/${problem.id}`}
+                        className="font-semibold hover:underline"
+                      >
                         {problem.title}
                       </Link>
                     </td>
@@ -193,7 +198,9 @@ const ProblemTable = ({problems}) => {
                           onClick={() => handleAddToPlaylist(problem.id)}
                         >
                           <Bookmark className="w-4 h-4" />
-                          <span className="hidden sm:inline">Save to Playlist</span>
+                          <span className="hidden sm:inline">
+                            Save to Playlist
+                          </span>
                         </button>
                       </div>
                     </td>
@@ -238,7 +245,7 @@ const ProblemTable = ({problems}) => {
         onClose={() => setIsCreateModalOpen(false)}
         onSubmit={handleCreatePlaylist}
       />
-      
+
       <AddToPlaylistModal
         isOpen={isAddToPlaylistModalOpen}
         onClose={() => setIsAddToPlaylistModalOpen(false)}
@@ -248,4 +255,4 @@ const ProblemTable = ({problems}) => {
   );
 };
 
-export default ProblemTable
+export default ProblemTable;
