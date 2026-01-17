@@ -1,6 +1,7 @@
 import { db } from "../libs/db.js";
 import {  getLanguageName, pollBatchResults, submitBatch } from "../libs/judge0.lib.js";
 
+// 🌟 Main controller function to handle code execution and submission
 export const executeCode = async(req,res)=>{
      try {
     const { source_code, language_id, stdin, expected_outputs, problemId } =
@@ -8,7 +9,7 @@ export const executeCode = async(req,res)=>{
 
     const userId = req.user.id;
 
-    // Validate test cases
+ // ✅ 1. Validate incoming test cases
 
     if (
       !Array.isArray(stdin) ||
@@ -19,24 +20,24 @@ export const executeCode = async(req,res)=>{
       return res.status(400).json({ error: "Invalid or Missing test cases" });
     }
 
-    // 2. Prepare each test cases for judge0 batch submission
+    // 📦 2. Prepare submissions for Judge0
     const submissions = stdin.map((input) => ({
       source_code,
       language_id,
       stdin: input,
     }));
 
-    // 3. Send batch of submissions to judge0
+    // 🚀 3. Submit batch
     const submitResponse = await submitBatch(submissions);
 
     const tokens = submitResponse.map((res)=>res.token);
 
-    // 4. poll judge0 for results of all submitted test cases
+       // ⏳ 4. Poll for results
     const results = await pollBatchResults(tokens);
     console.log('Result------')
     console.log(results);
 
-    // Analyze  test case results
+     // 📊 5. Analyze test results
     
     let allPassed = true;
     const detailedResults = results.map((result, i) => {
@@ -67,7 +68,7 @@ export const executeCode = async(req,res)=>{
     //  console.log(`Matched testcase #${i+1}: ${passed}`)
     })
     console.log(detailedResults)
-    // store submission summary
+    // 💾 6. Store submission summary
     const submission = await db.submission.create({
       data: {
         userId,
@@ -91,7 +92,7 @@ export const executeCode = async(req,res)=>{
           : null,
       },
     });
-    // If All passed = true mark problem as solved for the current user
+       // 🏆 7. Mark problem as solved if all test cases passed
     if (allPassed) {
       await db.problemSolved.upsert({
         where: {
@@ -107,8 +108,7 @@ export const executeCode = async(req,res)=>{
         },
       });
     }
-     // 8. Save individual test case results  using detailedResult
-
+     // 📁 8. Save individual test case results using detailedResults directly
     const testCaseResults = detailedResults.map((result) => ({
       submissionId: submission.id,
       testCase: result.testCase,
@@ -124,7 +124,7 @@ export const executeCode = async(req,res)=>{
     await db.testCaseResult.createMany({
       data: testCaseResults,
     });
-
+    // 🔍 9. Fetch full submission with test cases
     const submissionWithTestCase = await db.submission.findUnique({
       where: {
         id: submission.id,
@@ -133,7 +133,8 @@ export const executeCode = async(req,res)=>{
         testCases: true,
       },
     });
-    //
+   
+    // 📤 10. Respond to client
     res.status(200).json({
       success: true,
       message: "Code Executed! Successfully!",

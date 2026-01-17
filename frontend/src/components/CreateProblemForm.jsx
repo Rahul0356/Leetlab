@@ -309,7 +309,7 @@ class Main {
   },
 };
 
-// Sample problem data for another type of question
+
 // Sample problem data for another type of question
 const sampleStringProblem = {
   title: "Valid Palindrome",

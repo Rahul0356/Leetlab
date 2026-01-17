@@ -4,7 +4,7 @@ import {
   pollBatchResults,
   submitBatch,
 } from "../libs/judge0.lib.js";
-
+// Final Create Problem Handler
 export const createProblem = async (req, res) => {
   const {
     title,
@@ -18,12 +18,14 @@ export const createProblem = async (req, res) => {
     referenceSolutions,
   } = req.body;
 
-  // going to check the user role once again
+  // Step 1: Check if the requesting user is an admin
    if (req.user.role !== "ADMIN")
      return res.status(403).json({ error: "You are not allowed to create a problem" });
 
   try {
+        // Step 2: Loop through each reference solution for different languages
     for (const [language, solutionCode] of Object.entries(referenceSolutions)) {
+        // Step 2.1: Get Judge0 language ID for the current language
       const languageId = getJude0LanguageId(language);
 
       if (!languageId) {

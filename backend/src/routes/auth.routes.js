@@ -15,4 +15,8 @@ authRoutes.post("/logout",authMiddleware,logout)
 
 authRoutes.get("/check",authMiddleware,check)
 
+// router.get("/get-submissions",authenticate , getSubmissions)
+
+// router.get("/get-playlists" , authenticate , getUserPlaylists)
+
 export default authRoutes;

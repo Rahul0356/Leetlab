@@ -11,6 +11,7 @@ import Layout from "./layout/Layout.jsx";
 import AdminRoute from "./components/AdminRoute.jsx";
 import AddProblem from "./page/AddProblem.jsx";
 import ProblemPage from "./page/ProblemPage.jsx";
+import Profile from "./page/Profile.jsx";
 
 
 const App = () => {
@@ -37,6 +38,7 @@ const App = () => {
             element={authUser ? <HomePage /> : <Navigate to={"/login"} />}
           />
         </Route>
+       
         <Route
           path="/login"
           element={!authUser ? <LoginPage /> : <Navigate to={"/"} />}
@@ -57,6 +59,10 @@ const App = () => {
             element={authUser ? <AddProblem/> : <Navigate to="/" />}
           />
         </Route>
+        <Route 
+        path="/profile"
+        element={authUser  ? <Profile/> : <Navigate  to="/login"/>}
+        />
       </Routes>
     </div>
   );

@@ -3,7 +3,7 @@ import { db } from '../libs/db.js';
 import { UserRole } from '../generated/prisma/index.js';
 import jwt from 'jsonwebtoken';
 
-
+// REGISTER
 export const register = async (req , res)=>{
     const {email , password , name} = req.body;
 
@@ -62,6 +62,7 @@ export const register = async (req , res)=>{
     }
 }
 
+// LOGIN
 export const login = async (req , res)=>{
      const { email, password } = req.body || {};
       if (!email || !password) {
@@ -121,6 +122,7 @@ res.status(500).json({
     }
 }
 
+// LOGOUT
 export const logout = async (req , res)=>{
     try{
         res.clearCookie("jwt",{
@@ -139,7 +141,7 @@ export const logout = async (req , res)=>{
         })
     }
 }
-
+// CHECK AUTH
 export const check = async (req , res)=>{
     try{
         res.status(200).json({
@@ -155,3 +157,46 @@ export const check = async (req , res)=>{
 
     }
 }
+// GET SUBMISSIONS
+// export const getSubmissions = async (req, res) => {
+//   try {
+//     const submissions = await db.submission.findMany({
+//       where: {
+//         userId: req.user.id,
+//       },
+//     });
+//     res.status(200).json({
+//       success: true,
+//       message: "Submissions fetched successfully",
+//       submissions,
+//     });
+//   } catch (error) {
+//     console.error("Fetch Submissions Error:", error);
+//     res.status(500).json({ error: "Failed to fetch submissions" });
+//   }
+// };
+// GET USER PLAYLISTS
+// export const getUserPlaylists = async (req, res) => {
+//   try {
+//     const playLists = await db.playlist.findMany({
+//       where: {
+//         userId: req.user.id,
+//       },
+//       select: {
+//         id: true,
+//         name: true,
+//         description: true,
+//         createdAt: true,
+//       },
+//     });
+
+//     res.status(200).json({
+//       success: true,
+//       message: "Playlists fetched successfully",
+//       playLists,
+//     });
+//   } catch (error) {
+//     console.error("Fetch Playlists Error:", error);
+//     res.status(500).json({ error: "Failed to fetch playlists" });
+//   }
+// };
