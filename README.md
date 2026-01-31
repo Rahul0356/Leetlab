@@ -273,32 +273,7 @@ Store test results → Update user statistics → Display submission history
 
 ---
 
-## 📁 Project Structure
 
-```
-leetlab/
-├── backend/
-│   ├── src/
-│   │   ├── controllers/
-│   │   ├── routes/
-│   │   ├── middleware/
-│   │   ├── services/
-│   │   └── utils/
-│   ├── prisma/
-│   │   └── schema.prisma
-│   └── package.json
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── services/
-│   │   ├── store/
-│   │   └── utils/
-│   └── package.json
-└── README.md
-```
-
----
 
 ## 🤝 Contributing
 
