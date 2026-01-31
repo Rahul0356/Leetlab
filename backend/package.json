@@ -1,12 +1,13 @@
 {
   "name": "backend",
   "version": "1.0.0",
-"description":"This is a backend for leetcode-clone",
+  "description": "This is a backend for leetcode-clone",
   "main": "src/index.js",
   "scripts": {
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon src/index.js",
+    "start": "node src/index.js"
   },
- "keywords": [
+  "keywords": [
     "backend",
     "leetcode",
     "clone",

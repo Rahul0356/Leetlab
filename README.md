@@ -15,6 +15,7 @@ A fullstack coding practice platform inspired by LeetCode, built with modern web
 - [Tech Stack](#-tech-stack)
 - [Architecture](#-architecture)
 - [Getting Started](#-getting-started)
+- [Deploy to AWS EC2](#deploy-to-aws-ec2-github-actions)
 - [Environment Variables](#-environment-variables)
 - [API Endpoints](#-api-endpoints)
 - [Code Execution Flow](#-code-execution-flow)
@@ -136,6 +137,64 @@ npm run dev
 The application will be available at:
 - Frontend: `http://localhost:3000`
 - Backend API: `http://localhost:5000`
+
+### Running with Docker
+
+Prerequisites: Docker and Docker Compose.
+
+```bash
+# From project root - build and start all services (PostgreSQL, backend, frontend)
+docker compose up --build
+
+# Or run in background
+docker compose up -d --build
+```
+
+- **Frontend:** http://localhost:3000 (served by nginx; `/api` is proxied to the backend)
+- **Backend API:** http://localhost:8081 (host port 8081 to avoid conflict with local backend on 8080)
+- **PostgreSQL:** localhost:5433 (user: `leetlab`, password: `leetlab_secret`, db: `leetlab`) — host port 5433 to avoid conflict with local PostgreSQL on 5432
+
+Migrations run automatically when the backend container starts. For code execution (judge0), set `JUDGE0_API_URL` (and optionally API key) in a `.env` file in the project root or pass them when running `docker compose up`.
+
+### Deploy to AWS EC2 (GitHub Actions)
+
+The repo includes a GitHub Actions workflow that deploys to an EC2 instance on every push to `main` (or manually via **Actions → Deploy to AWS EC2 → Run workflow**).
+
+**1. EC2 setup**
+
+- Launch an Ubuntu or Amazon Linux EC2 instance.
+- Install Docker and Docker Compose on the instance (e.g. [Docker Engine](https://docs.docker.com/engine/install/) and [Docker Compose plugin](https://docs.docker.com/compose/install/)).
+- Ensure the instance security group allows:
+  - **Inbound:** SSH (22) from your IP or GitHub’s IPs, and ports **80** (or **3000**) and **8080** for the app and API.
+- Create an SSH key pair for deployments (e.g. `ssh-keygen -t ed25519 -f deploy_key`). Add the **public** key to the EC2 user’s `~/.ssh/authorized_keys` (e.g. `ec2-user` or `ubuntu`).
+
+**2. GitHub repository secrets**
+
+In the repo: **Settings → Secrets and variables → Actions**, add:
+
+| Secret           | Description                                      |
+|------------------|--------------------------------------------------|
+| `EC2_HOST`       | EC2 public IP or hostname (e.g. `3.110.xx.xx`)  |
+| `EC2_SSH_KEY`    | Full contents of the **private** deploy key file |
+| `EC2_USER`       | SSH user (e.g. `ec2-user` or `ubuntu`); optional, defaults to `ec2-user` |
+
+**3. First-time setup on EC2**
+
+SSH into the instance and create the app directory and optional `.env`:
+
+```bash
+mkdir -p ~/leetlab
+# Optional: create ~/leetlab/.env for production (CORS, judge0)
+# CORS_ORIGIN=http://YOUR_EC2_PUBLIC_IP:3000
+# JUDGE0_API_URL=https://your-judge0-url
+```
+
+**4. Deploy**
+
+- Push to `main` to trigger the workflow, or run **Deploy to AWS EC2** from the Actions tab.
+- The workflow syncs the repo to `~/leetlab` on EC2 and runs `docker compose up -d --build`.
+
+After a successful run, open **http://YOUR_EC2_IP:3000** (frontend) and **http://YOUR_EC2_IP:8080** (API). For production, set `CORS_ORIGIN` in `~/leetlab/.env` to your frontend URL (e.g. `http://your-domain.com:3000` or your domain).
 
 ---
 
