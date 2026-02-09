@@ -4,6 +4,26 @@ import {
   pollBatchResults,
   submitBatch,
 } from "../libs/judge0.lib.js";
+
+const normalizePythonSource = (languageId, sourceCode) => {
+  if (languageId !== 71 || typeof sourceCode !== "string") {
+    return { code: sourceCode, notice: null };
+  }
+
+  const lines = sourceCode.split("\n");
+  const hasTabs = lines.some((l) => /^\t+/.test(l));
+  const hasSpaces = lines.some((l) => /^ +/.test(l));
+
+  if (hasTabs && hasSpaces) {
+    return {
+      code: sourceCode.replace(/\t/g, "    "),
+      notice:
+        "Mixed tabs and spaces detected in Python reference solution — tabs converted to 4 spaces.",
+    };
+  }
+
+  return { code: sourceCode, notice: null };
+};
 // Final Create Problem Handler
 export const createProblem = async (req, res) => {
   const {
@@ -34,8 +54,13 @@ export const createProblem = async (req, res) => {
           .json({ error: `Language ${language} is not supported` });
       }
 
+      const { code: normalizedCode, notice } = normalizePythonSource(
+        languageId,
+        solutionCode
+      );
+
       const submissions = testcases.map(({ input, output }) => ({
-        source_code: solutionCode,
+        source_code: normalizedCode,
         language_id: languageId,
         stdin: input,
         expected_output: output,
@@ -51,7 +76,12 @@ export const createProblem = async (req, res) => {
 
         if (result.status.id !== 3) {
           return res.status(400).json({
-            error: `Testcase ${i + 1} failed for language ${language}`,
+            error: `Testcase ${i + 1} failed for language ${language}: ${result.status.description}`,
+            details: {
+              stderr: result.stderr || null,
+              compile_output: result.compile_output || null,
+              notice,
+            },
           });
         }
       }
@@ -184,8 +214,13 @@ export const updateProblem = async (req, res) => {
           });
         }
 
+        const { code: normalizedCode, notice } = normalizePythonSource(
+          languageId,
+          solutionCode
+        );
+
         const submissions = testcases.map(({ input, output }) => ({
-          source_code: solutionCode,
+          source_code: normalizedCode,
           language_id: languageId,
           stdin: input,
           expected_output: output,
@@ -198,7 +233,12 @@ export const updateProblem = async (req, res) => {
         for (let i = 0; i < results.length; i++) {
           if (results[i].status.id !== 3) {
             return res.status(400).json({
-              error: `Testcase ${i + 1} failed for language ${language}`,
+              error: `Testcase ${i + 1} failed for language ${language}: ${results[i].status.description}`,
+              details: {
+                stderr: results[i].stderr || null,
+                compile_output: results[i].compile_output || null,
+                notice,
+              },
             });
           }
         }

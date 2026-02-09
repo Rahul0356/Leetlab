@@ -1,15 +1,35 @@
 import { db } from "../libs/db.js";
-import {  getLanguageName, pollBatchResults, submitBatch } from "../libs/judge0.lib.js";
+import {
+  getLanguageName,
+  pollBatchResults,
+  submitBatch,
+} from "../libs/judge0.lib.js";
 
 // 🌟 Main controller function to handle code execution and submission
-export const executeCode = async(req,res)=>{
-     try {
+export const executeCode = async (req, res) => {
+  try {
     const { source_code, language_id, stdin, expected_outputs, problemId } =
       req.body;
 
+    // Preflight: for Python, detect mixed indentation (tabs + spaces)
+    let src = source_code;
+    let indentationWarning = null;
+    if (language_id === 71 && typeof src === "string") {
+      const lines = src.split("\n");
+      const hasTabs = lines.some((l) => /^\t+/.test(l));
+      const hasSpaces = lines.some((l) => /^ +/.test(l));
+      if (hasTabs && hasSpaces) {
+        // Auto-convert tabs to 4 spaces to reduce common IndentationError causes,
+        // but keep a warning so the client can review their formatting.
+        src = src.replace(/\t/g, "    ");
+        indentationWarning =
+          "Mixed tabs and spaces detected in Python source — tabs converted to 4 spaces. Please verify indentation.";
+      }
+    }
+
     const userId = req.user.id;
 
- // ✅ 1. Validate incoming test cases
+    // ✅ 1. Validate incoming test cases
 
     if (
       !Array.isArray(stdin) ||
@@ -22,7 +42,7 @@ export const executeCode = async(req,res)=>{
 
     // 📦 2. Prepare submissions for Judge0
     const submissions = stdin.map((input) => ({
-      source_code,
+      source_code: src,
       language_id,
       stdin: input,
     }));
@@ -30,15 +50,15 @@ export const executeCode = async(req,res)=>{
     // 🚀 3. Submit batch
     const submitResponse = await submitBatch(submissions);
 
-    const tokens = submitResponse.map((res)=>res.token);
+    const tokens = submitResponse.map((res) => res.token);
 
-       // ⏳ 4. Poll for results
+    // ⏳ 4. Poll for results
     const results = await pollBatchResults(tokens);
-    console.log('Result------')
+    console.log("Result------");
     console.log(results);
 
-     // 📊 5. Analyze test results
-    
+    // 📊 5. Analyze test results
+
     let allPassed = true;
     const detailedResults = results.map((result, i) => {
       const stdout = result.stdout?.trim();
@@ -57,23 +77,22 @@ export const executeCode = async(req,res)=>{
         status: result.status.description,
         memory: result.memory ? `${result.memory} KB` : undefined,
         time: result.time ? `${result.time} s` : undefined,
-      }
-      
+      };
 
-    //   console.log(`Testcase # ${i+1}`);
-    //   console.log(`Input for testcase #${i+1}: ${stdin[i]}`)
-    //   console.log(`Expected Output for testcase #${i+1}: ${expected_output}`)
-    //  console.log(`Actual output for testcase #${i+1}: ${stdout}`)
+      //   console.log(`Testcase # ${i+1}`);
+      //   console.log(`Input for testcase #${i+1}: ${stdin[i]}`)
+      //   console.log(`Expected Output for testcase #${i+1}: ${expected_output}`)
+      //  console.log(`Actual output for testcase #${i+1}: ${stdout}`)
 
-    //  console.log(`Matched testcase #${i+1}: ${passed}`)
-    })
-    console.log(detailedResults)
+      //  console.log(`Matched testcase #${i+1}: ${passed}`)
+    });
+    console.log(detailedResults);
     // 💾 6. Store submission summary
     const submission = await db.submission.create({
       data: {
         userId,
         problemId,
-        sourceCode: source_code,
+        sourceCode: src,
         language: getLanguageName(language_id),
         stdin: stdin.join("\n"),
         stdout: JSON.stringify(detailedResults.map((r) => r.stdout)),
@@ -92,7 +111,7 @@ export const executeCode = async(req,res)=>{
           : null,
       },
     });
-       // 🏆 7. Mark problem as solved if all test cases passed
+    // 🏆 7. Mark problem as solved if all test cases passed
     if (allPassed) {
       await db.problemSolved.upsert({
         where: {
@@ -108,7 +127,7 @@ export const executeCode = async(req,res)=>{
         },
       });
     }
-     // 📁 8. Save individual test case results using detailedResults directly
+    // 📁 8. Save individual test case results using detailedResults directly
     const testCaseResults = detailedResults.map((result) => ({
       submissionId: submission.id,
       testCase: result.testCase,
@@ -133,13 +152,16 @@ export const executeCode = async(req,res)=>{
         testCases: true,
       },
     });
-   
+
     // 📤 10. Respond to client
-    res.status(200).json({
+    const responsePayload = {
       success: true,
       message: "Code Executed! Successfully!",
       submission: submissionWithTestCase,
-    });
+    };
+    if (indentationWarning) responsePayload.notice = indentationWarning;
+
+    res.status(200).json(responsePayload);
   } catch (error) {
     console.error("Error executing code:", error.message);
     res.status(500).json({ error: "Failed to execute code" });
