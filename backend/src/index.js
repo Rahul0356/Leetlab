@@ -15,28 +15,12 @@ dotenv.config();
 
 const app = express();
 
-const allowedOrigins = (
-  process.env.CORS_ORIGIN || "https://leetlab-kf6g.onrender.com"
-)
-  .split(",")
-  .map((o) => o.trim())
-  .filter(Boolean);
-
-const corsOptions = {
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-};
-
-app.use(cors(corsOptions));
-app.options(/.*/, cors(corsOptions));
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN || "https://leetlab-kf6g.onrender.com",
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 app.use(cookieParser());
@@ -53,7 +37,6 @@ app.use("/api/v1/submission", submissionRoutes)
 app.use("/api/v1/playlist", playlistRoutes)
 
 
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+app.listen(process.env.PORT, () => {
+  console.log("Server is running on port 8080");
 });
